@@ -1,0 +1,16 @@
+# backend/Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Instalar dependencias
+COPY package*.json ./
+RUN npm install --omit=dev
+
+# Copiar código fuente
+COPY . .
+
+# Railway inyecta dinámicamente la variable PORT
+EXPOSE 4000
+
+CMD ["node", "server.js"]
