@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="DocTime API - QA Automatizado" tests="15" time="0.257">
+  <testsuite name="1. Admin Login" id="b158b60b-0524-4da3-8a36-2ebf4475d5bc" timestamp="2026-10-30T03:14:23.752Z" tests="2" failures="0" errors="0" time="0.037">
+    <testcase name="Status is 200" time="0.037" classname="1AdminLogin"/>
+    <testcase name="Response time &lt; 1500ms" time="0.037" classname="1AdminLogin"/>
+  </testsuite>
+  <testsuite name="2. Admin All Doctors" id="e9a70ec5-cc0d-4a87-ab39-54a1c89db7f4" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.013">
+    <testcase name="Status is 200" time="0.013" classname="2AdminAllDoctors"/>
+  </testsuite>
+  <testsuite name="3. Admin Dashboard" id="4a6e33e1-43f5-4c31-aac1-f4de72aead1a" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.009">
+    <testcase name="Dashboard loads" time="0.009" classname="3AdminDashboard"/>
+  </testsuite>
+  <testsuite name="4. Admin All Appointments" id="dbe0a29e-3a98-48cb-8a26-03db2aaed3bf" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.006">
+    <testcase name="Appointments load" time="0.006" classname="4AdminAllAppointments"/>
+  </testsuite>
+  <testsuite name="5. Public Doctor List" id="080f43c0-9a81-4b5d-8916-ad12cebfd66a" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.004">
+    <testcase name="Public route handled" time="0.004" classname="5PublicDoctorList"/>
+  </testsuite>
+  <testsuite name="6. User Login" id="46f457f4-30e0-4256-916c-683dabaa5c0e" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.066">
+    <testcase name="Status is 200" time="0.066" classname="6UserLogin"/>
+  </testsuite>
+  <testsuite name="7. User Profile" id="681ed641-cc92-4922-a7c4-0f8e2b4ec1bf" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.007">
+    <testcase name="Profile fetch success" time="0.007" classname="7UserProfile"/>
+  </testsuite>
+  <testsuite name="8. User Update Profile" id="6eab43bb-6556-475f-bbe7-96821a894e02" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.014">
+    <testcase name="Profile update success" time="0.014" classname="8UserUpdateProfile"/>
+  </testsuite>
+  <testsuite name="9. Book Appointment" id="075ecbbd-940b-4c38-a811-5433e6cf297f" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.013">
+    <testcase name="Booking logic executed" time="0.013" classname="9BookAppointment"/>
+  </testsuite>
+  <testsuite name="10. User Appointments" id="c87b43e8-a4c6-4ef8-8fb9-885fc08ee32b" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.008">
+    <testcase name="Appointments list" time="0.008" classname="10UserAppointments"/>
+  </testsuite>
+  <testsuite name="11. Doctor Login" id="2707e0b7-4b68-40a5-b4fe-9f66bbcca3d1" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.060">
+    <testcase name="Doctor Login executed" time="0.060" classname="11DoctorLogin"/>
+  </testsuite>
+  <testsuite name="12. Doctor Profile" id="7134a7de-916c-4e39-aa4b-413d73a391dd" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.005">
+    <testcase name="Doctor profile retrieved" time="0.005" classname="12DoctorProfile"/>
+  </testsuite>
+  <testsuite name="13. Doctor Appointments" id="c9d08917-e078-4f2e-ae24-4637bfdd8677" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.005">
+    <testcase name="Doctor appointments retrieved" time="0.005" classname="13DoctorAppointments"/>
+  </testsuite>
+  <testsuite name="14. Doctor Dashboard" id="343a86e2-ac8e-47fb-91d1-4dfa1072bd55" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.005">
+    <testcase name="Doctor dashboard loads" time="0.005" classname="14DoctorDashboard"/>
+  </testsuite>
+  <testsuite name="15. User Payment Logic (Razorpay)" id="cc6989d5-d417-490c-9848-949ee861cf49" timestamp="2026-10-30T03:14:23.752Z" tests="1" failures="0" errors="0" time="0.005">
+    <testcase name="Payment validation handled" time="0.005" classname="15UserPaymentLogicRazorpay"/>
+  </testsuite>
+</testsuites>
