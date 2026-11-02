@@ -8,5 +8,14 @@ export default defineConfig({
     react(), 
     tailwindcss(),
   ],
-  server: {port: 5174}
+  server: {port: 5174},
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov']
+    }
+  }
 })

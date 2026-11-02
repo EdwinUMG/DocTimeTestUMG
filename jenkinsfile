@@ -1,0 +1,118 @@
+pipeline {
+    agent any
+
+    environment {
+        // Credencial ID creada en Jenkins (Secret Text con tu GitHub Personal Access Token)
+        GITHUB_TOKEN = credentials('github-pat-token')
+        
+        // Ajusta con tu usuario exacto de GitHub y nombre del repositorio
+        REPO_OWNER   = 'EdwinUMG'
+        REPO_NAME    = 'DocTimeTestUMG'
+    }
+
+    stages {
+        stage('Notificar Inicio a GitHub') {
+            steps {
+                script {
+                    updateGitHubStatus('PENDING', 'Pipeline en ejecución...')
+                }
+            }
+        }
+
+        stage('Compilación y Dependencias') {
+            steps {
+                echo 'Instalando dependencias de Backend...'
+                dir('backend') {
+                    bat 'npm install'
+                }
+            }
+        }
+
+        stage('Pruebas Unitarias (E10)') {
+            steps {
+                echo 'Ejecutando suite de pruebas unitarias...'
+                dir('backend') {
+                    // Ejecuta Jest generando reporte de cobertura
+                    bat 'npm run test:coverage'
+                }
+            }
+        }
+
+        stage('Análisis Estático SonarQube (E12)') {
+            steps {
+                script {
+                    // Nombre del SonarScanner configurado en Global Tool Configuration de Jenkins
+                    def scannerHome = tool 'SonarQubeScanner'
+                    
+                    // Nombre del servidor SonarQube configurado en System Configuration de Jenkins
+                    withSonarQubeEnv('SonarQubeLocal') {
+                        bat """
+                            "${scannerHome}\\bin\\sonar-scanner" ^
+                            -Dsonar.projectKey=DocTime_ACS ^
+                            -Dsonar.sources=backend/controllers,backend/models,backend/middlewares,frontend/src,admin/src ^
+                            -Dsonar.tests=backend/tests ^
+                            -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Verificación Quality Gate (E12)') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    script {
+                        // Pausa la ejecución hasta recibir el veredicto de SonarQube vía webhook
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Quality Gate falló con estado: ${qg.status}. Se detiene el pipeline."
+                        }
+                        echo "Quality Gate APROBADO: ${qg.status}"
+                    }
+                }
+            }
+        }
+
+        stage('Pruebas de API Newman (E11)') {
+            steps {
+                echo 'Levantando base de datos en RAM y ejecutando colección Postman...'
+                dir('backend') {
+                    // Ejecuta Newman contra test-server.js
+                    bat 'npm run test:api'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                updateGitHubStatus('SUCCESS', 'Todos los controles de calidad fueron superados.')
+            }
+        }
+        failure {
+            script {
+                updateGitHubStatus('FAILURE', 'El pipeline falló en una o más etapas.')
+            }
+        }
+    }
+}
+
+// Función en PowerShell para notificar el estado del commit a GitHub de forma nativa en Windows
+def updateGitHubStatus(String state, String description) {
+    script {
+        // Obtiene el SHA limpio sin saltos de línea
+        def commitSha = env.GIT_COMMIT ?: bat(script: '@git rev-parse HEAD', returnStdout: true).trim().replaceAll("[\\r\\n]", "")
+
+        withCredentials([string(credentialsId: 'github-pat-token', variable: 'TOKEN')]) {
+            bat """
+                @curl -s -X POST ^
+                -H "Authorization: token %TOKEN%" ^
+                -H "Accept: application/vnd.github.v3+json" ^
+                -H "User-Agent: Jenkins-CI" ^
+                https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/statuses/${commitSha} ^
+                -d "{\\\"state\\\":\\\"${state.toLowerCase()}\\\",\\\"target_url\\\":\\\"${env.BUILD_URL}\\\",\\\"description\\\":\\\"${description}\\\",\\\"context\\\":\\\"continuous-integration/jenkins/pr-validation\\\"}"
+            """
+        }
+    }
+}
