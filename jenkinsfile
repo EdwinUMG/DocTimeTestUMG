@@ -6,7 +6,7 @@ pipeline {
         GITHUB_TOKEN = credentials('github-pat-token')
         
         // Ajusta con tu usuario exacto de GitHub y nombre del repositorio
-        REPO_OWNER   = 'edwinumg'
+        REPO_OWNER   = 'EdwinUMG'
         REPO_NAME    = 'DocTimeTestUMG'
     }
 
@@ -101,34 +101,18 @@ pipeline {
 // Función en PowerShell para notificar el estado del commit a GitHub de forma nativa en Windows
 def updateGitHubStatus(String state, String description) {
     script {
-        def commitSha = env.GIT_COMMIT
-        if (!commitSha) {
-            commitSha = bat(script: '@git rev-parse HEAD', returnStdout: true).trim()
+        // Obtiene el SHA limpio sin saltos de línea
+        def commitSha = env.GIT_COMMIT ?: bat(script: '@git rev-parse HEAD', returnStdout: true).trim().replaceAll("[\\r\\n]", "")
+
+        withCredentials([string(credentialsId: 'github-pat-token', variable: 'TOKEN')]) {
+            bat """
+                @curl -s -X POST ^
+                -H "Authorization: token %TOKEN%" ^
+                -H "Accept: application/vnd.github.v3+json" ^
+                -H "User-Agent: Jenkins-CI" ^
+                https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/statuses/${commitSha} ^
+                -d "{\\\"state\\\":\\\"${state.toLowerCase()}\\\",\\\"target_url\\\":\\\"${env.BUILD_URL}\\\",\\\"description\\\":\\\"${description}\\\",\\\"context\\\":\\\"continuous-integration/jenkins/pr-validation\\\"}"
+            """
         }
-
-        powershell """
-            \$headers = @{
-                'Authorization' = 'token ${GITHUB_TOKEN}'
-                'Accept' = 'application/vnd.github.v3+json'
-                'User-Agent' = 'Jenkins-CI'
-            }
-            \$body = @{
-                state = '${state.toLowerCase()}'
-                target_url = '${env.BUILD_URL}'
-                description = '${description}'
-                context = 'continuous-integration/jenkins/pr-validation'
-            } | ConvertTo-Json
-
-            try {
-                Invoke-RestMethod -Uri 'https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/statuses/${commitSha}' `
-                                  -Method Post `
-                                  -Headers \$headers `
-                                  -Body \$body `
-                                  -ContentType 'application/json'
-                Write-Host "Estado ${state} notificado exitosamente a GitHub."
-            } catch {
-                Write-Error "Error al notificar a GitHub: \$_"
-            }
-        """
     }
 }
