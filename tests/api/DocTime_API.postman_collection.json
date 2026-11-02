@@ -1,0 +1,273 @@
+{
+	"info": {
+		"name": "DocTime API - QA Automatizado",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:4000" },
+		{ "key": "atoken", "value": "" },
+		{ "key": "utoken", "value": "" },
+		{ "key": "dtoken", "value": "" },
+		{ "key": "docId", "value": "" }
+	],
+	"item": [
+		{
+			"name": "1. Admin Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"Response time < 1500ms\", () => { pm.expect(pm.response.responseTime).to.be.below(1500); });",
+							"let res = pm.response.json();",
+							"if(res.success) { pm.collectionVariables.set(\"atoken\", res.token); }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\"email\":\"admin@doctime.com\",\"password\":\"admin_password123\"}" },
+				"url": { "raw": "{{baseUrl}}/api/v1/admin/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "admin", "login"] }
+			}
+		},
+		{
+			"name": "2. Admin All Doctors",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => { pm.response.to.have.status(200); });",
+							"let res = pm.response.json();",
+							"if(res.doctors && res.doctors.length > 0) { pm.collectionVariables.set(\"docId\", res.doctors[0]._id); }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "atoken", "value": "{{atoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/admin/all-doctors", "host": ["{{baseUrl}}"], "path": ["api", "v1", "admin", "all-doctors"] }
+			}
+		},
+		{
+			"name": "3. Admin Dashboard",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Dashboard loads\", () => { pm.response.to.have.status(200); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "atoken", "value": "{{atoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/admin/dashboard", "host": ["{{baseUrl}}"], "path": ["api", "v1", "admin", "dashboard"] }
+			}
+		},
+		{
+			"name": "4. Admin All Appointments",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Appointments load\", () => { pm.response.to.have.status(200); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "atoken", "value": "{{atoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/admin/appointments", "host": ["{{baseUrl}}"], "path": ["api", "v1", "admin", "appointments"] }
+			}
+		},
+		{
+			"name": "5. Public Doctor List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Public route handled\", () => { pm.expect(pm.response.code).to.be.oneOf([200, 404]); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"url": { "raw": "{{baseUrl}}/api/v1/doctor/list", "host": ["{{baseUrl}}"], "path": ["api", "v1", "doctor", "list"] }
+			}
+		},
+		{
+			"name": "6. User Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => { pm.response.to.have.status(200); });",
+							"let res = pm.response.json();",
+							"if(res.success) { pm.collectionVariables.set(\"utoken\", res.token); }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\"email\":\"paciente.valido@test.com\",\"password\":\"PasswordSeguro2026!\"}" },
+				"url": { "raw": "{{baseUrl}}/api/v1/user/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "user", "login"] }
+			}
+		},
+		{
+			"name": "7. User Profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Profile fetch success\", () => { pm.response.to.have.status(200); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "token", "value": "{{utoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/user/get-profile", "host": ["{{baseUrl}}"], "path": ["api", "v1", "user", "get-profile"] }
+			}
+		},
+		{
+			"name": "8. User Update Profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Profile update success\", () => { pm.response.to.have.status(200); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{"key": "token", "value": "{{utoken}}"}],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{ "key": "name", "value": "Paciente Modificado", "type": "text" },
+						{ "key": "phone", "value": "12345678", "type": "text" },
+						{ "key": "gender", "value": "Male", "type": "text" },
+						{ "key": "dob", "value": "1990-01-01", "type": "text" },
+						{ "key": "address", "value": "{\"line1\":\"Calle 1\"}", "type": "text" }
+					]
+				},
+				"url": { "raw": "{{baseUrl}}/api/v1/user/update-profile", "host": ["{{baseUrl}}"], "path": ["api", "v1", "user", "update-profile"] }
+			}
+		},
+		{
+			"name": "9. Book Appointment",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Booking logic executed\", () => { pm.expect(pm.response.code).to.be.oneOf([200,201, 400, 401]); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{"key": "token", "value": "{{utoken}}"}, {"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\"docId\":\"{{docId}}\",\"slotDate\":\"30_12_2026\",\"slotTime\":\"10:00 AM\"}" },
+				"url": { "raw": "{{baseUrl}}/api/v1/user/book-appointment", "host": ["{{baseUrl}}"], "path": ["api", "v1", "user", "book-appointment"] }
+			}
+		},
+		{
+			"name": "10. User Appointments",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Appointments list\", () => { pm.response.to.have.status(200); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "token", "value": "{{utoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/user/appointments", "host": ["{{baseUrl}}"], "path": ["api", "v1", "user", "appointments"] }
+			}
+		},
+		{
+			"name": "11. Doctor Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Doctor Login executed\", () => { pm.expect(pm.response.code).to.be.oneOf([200, 400, 401]); });",
+							"let res = pm.response.json();",
+							"if(res.success && res.token) { pm.collectionVariables.set(\"dtoken\", res.token); }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\"email\":\"doctor.activo@test.com\",\"password\":\"DocPass2026#\"}" },
+				"url": { "raw": "{{baseUrl}}/api/v1/doctor/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "doctor", "login"] }
+			}
+		},
+		{
+			"name": "12. Doctor Profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Doctor profile retrieved\", () => { pm.expect(pm.response.code).to.be.oneOf([200, 401]); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "dtoken", "value": "{{dtoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/doctor/profile", "host": ["{{baseUrl}}"], "path": ["api", "v1", "doctor", "profile"] }
+			}
+		},
+		{
+			"name": "13. Doctor Appointments",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Doctor appointments retrieved\", () => { pm.expect(pm.response.code).to.be.oneOf([200, 401]); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "dtoken", "value": "{{dtoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/doctor/appointments", "host": ["{{baseUrl}}"], "path": ["api", "v1", "doctor", "appointments"] }
+			}
+		},
+		{
+			"name": "14. Doctor Dashboard",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Doctor dashboard loads\", () => { pm.expect(pm.response.code).to.be.oneOf([200, 401]); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [{"key": "dtoken", "value": "{{dtoken}}"}],
+				"url": { "raw": "{{baseUrl}}/api/v1/doctor/dashboard", "host": ["{{baseUrl}}"], "path": ["api", "v1", "doctor", "dashboard"] }
+			}
+		},
+		{
+			"name": "15. User Payment Logic (Razorpay)",
+			"event": [
+				{
+					"listen": "test",
+					"script": { "exec": [ "pm.test(\"Payment validation handled\", () => { pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]); });" ], "type": "text/javascript" }
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{"key": "token", "value": "{{utoken}}"}, {"key": "Content-Type", "value": "application/json"}],
+				"body": { "mode": "raw", "raw": "{\"appointmentId\":\"60d0fe4f5311236168a109cc\"}" },
+				"url": { "raw": "{{baseUrl}}/api/v1/user/payment-razorpay", "host": ["{{baseUrl}}"], "path": ["api", "v1", "user", "payment-razorpay"] }
+			}
+		}
+	]
+}

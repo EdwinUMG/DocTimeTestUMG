@@ -5,7 +5,10 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:mock": "node test-server.js",
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:coverage": "jest --coverage --coverageReporters=lcov --coverageReporters=text",
+    "test:api": "start-server-and-test start:mock http://localhost:4000 \"newman run ../tests/api/DocTime_API.postman_collection.json --reporters cli,junit --reporter-junit-export ../reports/newman-results.xml\"",
     "start": "node server.js",
     "server": "nodemon server.js"
   },
@@ -26,5 +29,15 @@
     "nodemon": "^3.1.9",
     "razorpay": "^2.9.6",
     "validator": "^13.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.9",
+    "@babel/preset-env": "^8.0.7",
+    "babel-jest": "^30.5.2",
+    "jest": "^30.5.2",
+    "mongodb-memory-server": "^11.3.0",
+    "newman": "^6.2.3",
+    "start-server-and-test": "^3.0.13",
+    "supertest": "^7.3.1"
   }
 }
