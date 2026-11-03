@@ -156,19 +156,13 @@ const doctorDashboard = async (req, res) => {
 
     const appointments = await appointmentModel.find({ docId });
 
-    let earnings = 0;
-    appointments.map((item) => {
-      if (item.isCompleted || item.payment) {
-        earnings += item.amount;
-      }
-    });
+    let earnings = appointments
+      .filter(item => item.isCompleted || item.payment )
+      .reduce((total, item) => total + item.amount, 0);
 
-    let patients = [];
-    appointments.map((item) => {
-      if (!patients.includes(item.userId)) {
-        patients.push(item.userId);
-      }
-    });
+    let patients = appointments
+      .filter(item => !patients.includes(item.userId))
+      .map(item => item.userId);
 
     const dashData = {
       earnings,
