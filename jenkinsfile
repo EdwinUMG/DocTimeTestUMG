@@ -127,35 +127,33 @@ pipeline {
             }
         }
 
-        // ==========================================
-        // DESPLIEGUE SELECTIVO A RAILWAY (E13)
+       // ==========================================
+        // DESPLIEGUE CONTINUO A RAILWAY (E13)
         // ==========================================
         stage('Despliegue Continuo a Railway (E13)') {
+            when {
+                anyOf {
+                    branch 'qa'
+                    branch 'main'
+                }
+            }
             steps {
                 withCredentials([string(credentialsId: 'railway-api-token', variable: 'RAILWAY_TOKEN')]) {
                     script {
-                        // Despliegue Backend
+                        echo "Rama autorizada para despliegue: ${env.BRANCH_NAME}. Procediendo con Railway..."
+                        
+                        // Despliegue condicional por módulo (Backend / Frontend / Admin)
                         if (currentBuild.changeSets.any { cs -> cs.any { it.affectedFiles.any { f -> f.path.startsWith('backend/') } } } || env.BRANCH_NAME == 'main') {
                             echo 'Desplegando Backend en Railway...'
                             deployToRailway(env.RAILWAY_SERVICE_BACKEND, env.RAILWAY_ENV_ID)
-                        } else {
-                            echo 'Backend sin cambios. Despliegue omitido.'
                         }
-
-                        // Despliegue Frontend
                         if (currentBuild.changeSets.any { cs -> cs.any { it.affectedFiles.any { f -> f.path.startsWith('frontend/') } } } || env.BRANCH_NAME == 'main') {
                             echo 'Desplegando Frontend en Railway...'
                             deployToRailway(env.RAILWAY_SERVICE_FRONTEND, env.RAILWAY_ENV_ID)
-                        } else {
-                            echo 'Frontend sin cambios. Despliegue omitido.'
                         }
-
-                        // Despliegue Admin
                         if (currentBuild.changeSets.any { cs -> cs.any { it.affectedFiles.any { f -> f.path.startsWith('admin/') } } } || env.BRANCH_NAME == 'main') {
                             echo 'Desplegando Admin en Railway...'
                             deployToRailway(env.RAILWAY_SERVICE_ADMIN, env.RAILWAY_ENV_ID)
-                        } else {
-                            echo 'Admin sin cambios. Despliegue omitido.'
                         }
                     }
                 }
