@@ -161,7 +161,7 @@ const doctorDashboard = async (req, res) => {
       .reduce((total, item) => total + item.amount, 0)
       ;
 
-    let patients = [...Set(appointments.map(item => item.userId))];
+    let patients = [...new Set(appointments.map(item => item.userId))];
 
     const dashData = {
       earnings,
