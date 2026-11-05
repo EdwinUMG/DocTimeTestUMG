@@ -54,7 +54,7 @@ pipeline {
                 echo 'Cambios detectados en Frontend. Ejecutando pruebas...'
                 dir('frontend') {
                     bat 'npm install'
-                    bat 'npm test -- --run'
+                    bat 'npm run test:coverage'
                 }
             }
         }
@@ -73,7 +73,7 @@ pipeline {
                 echo 'Cambios detectados en Admin. Ejecutando pruebas...'
                 dir('admin') {
                     bat 'npm install'
-                    bat 'npm test -- --run'
+                    bat 'npm run test:coverage'
                 }
             }
         }
@@ -91,7 +91,7 @@ pipeline {
                             -Dsonar.projectKey=DocTime_ACS ^
                             -Dsonar.sources=backend/controllers,backend/models,backend/middlewares,frontend/src,admin/src ^
                             -Dsonar.tests=backend/tests ^
-                            -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info
+                            -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,frontend/coverage/lcov.info,admin/coverage/lcov.info
                         """
                     }
                 }
